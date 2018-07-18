@@ -1,0 +1,3 @@
+SSID = "abc"
+PASSWORD = "def"
+

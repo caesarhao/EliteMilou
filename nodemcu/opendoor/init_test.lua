@@ -1,10 +1,19 @@
 
+dofile("info.lua")
 local pinDoor = 1 --GPIO5, io index is 1
-local SSID = "abc"
-local PASSWORD = "def"
+local pinDoorIntr = 2 --GPIO4, io index is 2
+local doorIntrRecords = {}
+--local SSID = "abc"
+--local PASSWORD = "def"
+if SSID == nil then
+	SSID = "xyz"
+end
+if PASSWORD == nil then
+	PASSWORD = "opq"
+end
 
 function getDoorState()
-	if (0 == gpio.read(pinDoor))
+	if (0 == gpio.read(pinDoor)) then
 		return "Closed"
 	else
 		return "Opened"
@@ -13,18 +22,22 @@ end
 
 function receiver(sck, data)
 	local response = {}
-
+  print("Received :"..data)
   -- if you're sending back HTML over HTTP you'll want something like this instead
   -- local response = {"HTTP/1.0 200 OK\r\nServer: NodeMCU on ESP8266\r\nContent-Type: text/html\r\n\r\n"}
-
+  local tm = rtctime.epoch2cal(rtctime.get())
+  local now = string.format("%04d/%02d/%02d %02d:%02d:%02d", tm["year"], tm["mon"], tm["day"], tm["hour"], tm["min"], tm["sec"]))
   response[#response + 1] = "HTTP/1.0 200 OK\r\n"
   response[#response + 1] = "Server: NodeMCU on ESP8266\r\n"
+  response[#response + 1] = "MIME-version: 1.0\r\n"
+  response[#response + 1] = "Last-Modified: "..now.."\r\n"
   response[#response + 1] = "Content-Type: text/html\r\n\r\n"
 
   response[#response + 1] = "<HTML>\r\n"
   response[#response + 1] = "<TITLE>Door state<\/TITLE>\r\n"
   response[#response + 1] = "<BODY>\r\n"
-  response[#response + 1] = "Current state: "..getDoorState().."\r\n"
+  response[#response + 1] = "Current state: "..getDoorState().."<br>\r\n"
+  
   response[#response + 1] = "<\/BODY>\r\n"
   response[#response + 1] = "<\/HTML>\r\n"
 
@@ -112,7 +125,18 @@ wifi_disconnect_event = function(T)
   end
 end
 
+function recordDoorIntr(level, when, eventcount)
+	if (1 == level) then
+		local tm = rtctime.epoch2cal(rtctime.get())
+		local now = string.format("%04d/%02d/%02d %02d:%02d:%02d", tm["year"], tm["mon"], tm["day"], tm["hour"], tm["min"], tm["sec"]))
+		doorIntrRecords[#doorIntrRecords + 1] = now
+	end
+end
+
 gpio.mode(pinDoor, gpio.INPUT, gpio.PULLUP)
+gpio.mode(pinDoorIntr, gpio.INT, gpio.PULLUP)
+gpio.trig(pinDoorIntr, "up", recordDoorIntr)
+
 -- Register WiFi Station event callbacks
 wifi.eventmon.register(wifi.eventmon.STA_CONNECTED, wifi_connect_event)
 wifi.eventmon.register(wifi.eventmon.STA_GOT_IP, wifi_got_ip_event)
