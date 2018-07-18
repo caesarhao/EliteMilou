@@ -1,3 +1,3 @@
-SSID = "abc"
-PASSWORD = "def"
+SSID = "xyz"
+PASSWORD = "opq"
 
