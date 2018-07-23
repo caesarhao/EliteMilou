@@ -1,10 +1,9 @@
 
-dofile("info.lua")
+dofile("nodeinfo.lua")
 local pinDoor = 1 --GPIO5, io index is 1
 local pinDoorIntr = 2 --GPIO4, io index is 2
 local doorIntrRecords = {}
---local SSID = "abc"
---local PASSWORD = "def"
+
 if SSID == nil then
 	SSID = "xyz"
 end
@@ -136,19 +135,20 @@ end
 gpio.mode(pinDoor, gpio.INPUT, gpio.PULLUP)
 gpio.mode(pinDoorIntr, gpio.INT, gpio.PULLUP)
 gpio.trig(pinDoorIntr, "up", recordDoorIntr)
-
-
-print("Connecting to WiFi access point...")
-wifi.setmode(wifi.STATION)
---if (wifi.sta.sethostname("NodeMCU") == true) then
---    print("hostname was successfully changed")
---else
---    print("hostname was not changed")
---end
---print("Current hostname is :"..wifi.sta.gethostname())
-wifi.sta.config(SSID, PASSWORD)
--- wifi.sta.connect() not necessary because config() uses auto-connect=true by default
 -- Register WiFi Station event callbacks
 wifi.eventmon.register(wifi.eventmon.STA_CONNECTED, wifi_connect_event)
 wifi.eventmon.register(wifi.eventmon.STA_GOT_IP, wifi_got_ip_event)
 wifi.eventmon.register(wifi.eventmon.STA_DISCONNECTED, wifi_disconnect_event)
+
+print("Connecting to WiFi access point...")
+wifi.setmode(wifi.STATION)
+if (wifi.sta.sethostname("NodeMCU") == true) then
+    print("hostname was successfully changed")
+else
+    print("hostname was not changed")
+end
+print("Current hostname is :"..wifi.sta.gethostname())
+wifi.sta.config({ssid=SSID, password=PASSWORD, auto=true})
+-- wifi.sta.connect() not necessary because config() uses auto-connect=true by default
+
+

@@ -1,0 +1,3 @@
+SSID = "seeyouseeme"
+PASSWORD = "whoknows"
+
