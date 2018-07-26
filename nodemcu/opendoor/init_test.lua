@@ -67,7 +67,7 @@ function startup()
 	)
     -- start http server
 	-- net.TCP, 30 sec timeout
-	srv = net.createServer(30)
+	srv = net.createServer(net.TCP, 30)
 	if srv then
 		srv:listen(80, function(conn)
 			conn:on("receive", receiver)
@@ -148,7 +148,7 @@ else
     print("hostname was not changed")
 end
 print("Current hostname is :"..wifi.sta.gethostname())
-wifi.sta.config({ssid=SSID, password=PASSWORD, auto=true})
+wifi.sta.config({ssid=SSID, pwd=PASSWORD, auto=true})
 -- wifi.sta.connect() not necessary because config() uses auto-connect=true by default
 
 
