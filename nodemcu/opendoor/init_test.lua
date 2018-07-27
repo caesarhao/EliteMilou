@@ -57,9 +57,10 @@ end
 
 function startup()
 	-- sync the time from 0.fr.pool.ntp.org
-	sntp.sync("224.0.1.1",
+	sntp.sync("0.fr.pool.ntp.org",
 		function(sec, usec, server, info)
-			print('sync', sec, usec, server)
+            rtctime.set(sec + (3600*2))
+            print('sync', sec, usec, server)
 		end,
 		function()
 			print('failed!')
