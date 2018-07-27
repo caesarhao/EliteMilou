@@ -71,7 +71,6 @@ function startup()
 	if srv then
 		srv:listen(80, function(conn)
 			conn:on("receive", receiver)
-			conn:send("Hello world")
 		end)
 	end
 end
